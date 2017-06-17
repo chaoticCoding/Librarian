@@ -1,0 +1,54 @@
+<?php
+
+namespace core;
+
+/** Working 7/16/2016
+ * Everyday cookie processing, mmm cookies!
+ *
+ * @package core
+ */
+class cookies extends \core\coreStatic{
+
+	/** Working 7/16/2016
+	 * Sets Cookie, if already exists it will be over written
+	 *
+	 * @param $key
+	 * @param $value
+	 * @param int $TTL
+	 * @param string $path
+	 * @param string $domain
+	 * @param bool $secure
+	 * @param bool $httponly
+	 * @return bool
+	 ***/
+	public static function Set($key, $value, $TTL = 2592000, $path = "/", $domain = '', $secure = false, $httponly = false) {
+		return setcookie($key, $value, time() + $TTL, $path, $domain , $secure, $httponly);
+	}
+
+	/** Working 7/16/2016
+	 * Gets cookie if is set, if not returns null, can also be used to check to see if a cookie exists
+	 *
+	 * @param $key
+	 * @return null
+	 ***/
+	public static function Get($key){
+		if(isset($_COOKIE[$key])) {
+			return $_COOKIE[$key];
+		}
+
+		return null;
+	}
+
+	/** Working 7/16/2016
+	 * Removes Cookie buy both unset and sets experation to expire 1hour prior to now
+	 * @param $key
+	 * @return bool
+	 ***/
+	public static function Delete($key){
+		unset($_COOKIE[$key]);
+
+		// empty value and expiration one hour before
+		$res = setcookie($key, '', time() - 3600);
+		return $res;
+	}
+}

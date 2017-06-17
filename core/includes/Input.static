@@ -1,0 +1,176 @@
+<?php
+
+namespace core {
+
+	/**
+	 * Class Input
+	 * Input Processor
+	 *
+	 * @package core
+	 ***/
+	class Input extends \core\coreStatic {
+		private static $_whiteList = [];
+
+		private static $_POST = [];
+		private static $_GET = [];
+
+		private static $_Settings = [];
+
+		/**
+		 * Public constructor will be called on creation
+		 *
+		 * @param array $Settings
+		 ***/
+
+		public static function __Init__(  $Settings = null ) {
+
+			if(isset($settings)) { // TODO Add Error correction
+				self::$_Settings = $Settings;
+			}
+		}
+
+		/** TODO
+		 * Add Entry to white list to allow processing next time around
+		 * @param        $name
+		 * @param string $type
+		 * @param string $validation
+		 * @param string $source
+		 * @param int    $duration
+		 ***/
+		public static function addtoWhiteList($name, $type = 'post', $validation = '', $source = 'session', $duration = 1){
+
+			if($source === 'session') {
+				self::addtoSessionWhitelist($name, $type, $validation, $duration);
+
+			} elseif($source === 'Global') { // Adds to G
+				self::addtoGolobalWhitelist($name, $type, $validation, $duration);
+
+			} else {
+
+			}
+		}
+
+		/**
+		 * @param        $name
+		 * @param string $type
+		 * @param string $validation
+		 * @param int    $duration
+		 ***/
+		public static function addtoSessionWhitelist($name, $type = 'post', $validation = '', $duration = 1){
+			self::$_whiteList = [];
+		}
+
+		/**
+		 * @param        $name
+		 * @param string $type
+		 * @param string $validation
+		 * @param int    $duration
+		 ***/
+		public static function addtoGolobalWhitelist($name, $type = 'post', $validation = '', $duration = 1){
+			self::$_whiteList = [];
+		}
+
+
+		/**
+		 *
+		 ***/
+		public static function restoreWhitelist(){
+			self::restoreWhitelistFromSession();
+			self::restoreWhitelistFromGlobal();
+		}
+
+		/**
+		 *
+		 ***/
+		public static function restoreWhitelistFromSession(){
+			self::$_whiteList = [];
+		}
+
+		/**
+		 *
+		 ***/
+		public static function restoreWhitelistFromGlobal(){
+
+			self::$_whiteList = [];
+		}
+
+		/** TODO
+		 * processes $_POST for valid and preserves valid responses from white list
+		 ***/
+		public static function processPost(){
+
+		}
+
+		/** TODO
+		 * processes $_Get for valid and preserves valid responses from white list
+		 ***/
+		public static function processGet(){
+
+		}
+
+		/** TODO
+		 * Gets value from safe list
+		 * @param $key
+		 *
+		 * @return string
+		 ***/
+		public static function Post($key){
+			if(isset(self::$_POST[$key])){
+
+				return self::$_POST[$key];
+			}
+			return null;
+
+		}
+
+		/** TODO
+		 * @param $key
+		 *
+		 * @return string
+		 ***/
+		public static function Get($key){
+
+			if(isset(self::$_GET[$key])){
+
+				return self::$_GET[$key];
+			}
+
+			return null;
+
+		}
+	}
+}
+
+/**
+ *
+ ***/
+namespace core\Input {
+
+	/**
+	 * Class Files
+	 *
+	 * @package core\Input
+	 ***/
+	class Files {
+
+	}
+
+	/**
+	 * Class Fields
+	 *
+	 * @package core\Input
+	 ***/
+	class Fields {
+
+	}
+
+	/**
+	 * Class URI
+	 *
+	 * @package core\Input
+	 ***/
+	class URI {
+
+	}
+}
+

@@ -1,0 +1,140 @@
+<?php
+
+/**
+ * basic File.cache_engine hook meant to be used in core books before any others are built then to be trashed when the main cache engine is loaded
+ ***/
+namespace core {
+    /** TODO
+     * Cache Stub mimics the File.cache_engine module but can be run self contained until the main caching engine is running then gracefully be merged
+     * as this is a simple cache system there is no control for items and limited functionality for expiration times. as well as limited abilities for returning array branches,
+     *
+     * Class cacheStub
+     * @package core
+     */
+    class cacheStub {
+        /** @var array
+         * @var[modulepath] = moduleCache () // module data
+         */
+        private $_cachedData = array ();
+
+        /**
+         * @var array
+         */
+        private $_Settings = array ();
+
+        private $_cacheFile = array('loaded' => false,);
+
+
+        /**
+         * @param $settings
+         */
+        public function __construct($settings){
+            $this->_Settings = $settings;
+
+            $this->_cacheFile['loaded'] = $this::loadCache();
+        }
+
+        public function cacheLoaded(){
+            return $this->_cacheFile['loaded'];
+        }
+
+        /**
+         * Adds data to $_cachedData
+         *
+         * @param $key | Module Path
+         * @param $value | (array) from module information
+         * @param $write | (boolean) should the cache be written after value is set?
+         *
+         ***/
+        public function Set($key, $value, $write = true) {
+            // print ("<!-- adding values to key " . $key . "-->\n"); //TODO-Remove | Disabled as testing is not needed at the moment
+            $this->_cachedData[$key] = $value;
+
+	        if($write == true) {
+		        $this->writeCache();
+	        }
+        }
+
+        /**
+         * @param $key
+         * @return bool
+         */
+        public function Get( $key ) {
+
+            if(isset( $this->_cachedData[$key])) {
+                // print ("<!-- pulled key \"$key\" from cache -->\n"); //TODO-Remove | Disabled as testing is not needed at the moment
+                return $this->_cachedData[$key];
+            }
+
+	        // print ("<!--  key \"$key\" unavailable in cache -->\n"); //TODO-Remove | Disabled as testing is not needed at the moment
+            return false;
+        }
+
+        /** TODO update to include timestamp in filename
+         * retreives cache from file
+         */
+        public function loadCache() {
+            print ("<!-- trying to load cache @ " . $this->getPath() . " -->\n");
+
+            if(file_exists($this->getPath())) {
+                $this->_cacheFile['file_exists'] = true;
+                print ("<!-- cache file exists -->\n");
+
+                if (is_readable($this->getPath())) {
+                    $this->_cacheFile['file_readable'] = true;
+                    print ("<!-- cache file readable -->\n");
+
+                    print ("<!-- Cache found " . $this->getPath() . " -->\n");
+
+                    /**
+                     * http://php.net/manual/en/function.filemtime.php
+                     */
+                    $this->_cacheFile['file_modified'] = @filemtime($this->getPath());  // returns FALSE if file does not exist
+
+                    // if cache has not expired read
+                    if ($this->_cacheFile['file_modified'] or (time() - $this->_cacheFile['file_modified'] < $this->_Settings['cache_life'] )){
+                        $_cachedData = file_get_contents($this->getPath()) or die("Unable to open file!");
+
+                        /**
+                         * http://php.net/manual/en/function.unserialize.php
+                         */
+                        $this->_cachedData = unserialize($_cachedData);
+
+                        print ("<!-- Cache loaded -->\n");
+
+                        return true;
+
+                    }
+                }
+            }
+
+            return false;
+        }
+
+        /** TODO update to include timestamp in filename
+         * Function for writing cache out to file
+         */
+        public function writeCache() {
+            //print ("<!-- trying to write Cache @ " . $this->getPath() . ": " . realpath($this->getPath()) . " -->\n"); //TODO-Remove | Disabled as testing is not needed at the moment
+
+                print ("<!-- writing -->\n");
+                $cacheFile = fopen($this->getPath(), "w") or die("Unable to open file!");
+
+                /**
+                 * http://php.net/manual/en/function.serialize.php
+                 */
+                fwrite($cacheFile, serialize($this->_cachedData));
+
+                fclose($cacheFile);
+                //print ("<!-- writing complete -->\n"); //TODO-Remove | Disabled as testing is not needed at the moment
+        }
+
+        /** TODO update to include timestamp in filename?
+         * returns path for cache file.
+         * @return string
+         */
+        public function getPath(){
+            return $this->_Settings['path'] . DIRECTORY_SEPARATOR .  $this->_Settings['name'] . ".cache";
+        }
+    }
+}

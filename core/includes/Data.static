@@ -1,0 +1,87 @@
+<?php
+
+namespace core {
+	/** TODO - NONWORKING
+	 * Simplified Data storage
+	 *
+	 * Class Data
+	 */
+	class Data extends \core\coreStatic {
+
+		// Stores built Data
+		private static $_Data = array();
+
+		/** returns data in block if exist else returns false
+		 * clone of the function for simplafing settings calls
+		 * @param null $path : Database || Database/default
+		 *
+		 * @return bool
+		 */
+		public static function Get($path = null){
+
+			if ( $path ){
+
+				$block = self::$_Data;
+
+				$path = explode('/', $path);
+
+				$exists = 0;
+
+				foreach ($path as $bit){
+
+
+					if (isset($block[$bit])){
+						$exists++;
+
+						$block = $block[$bit];
+					}
+				}
+
+				if (count($path) == $exists) {
+
+					return $block;
+
+				}
+			}
+
+			return false;
+
+		}
+
+		/** TODO needs to be built
+		 *
+		 * Stores new value in data block
+		 *
+		 * @param $path
+		 * @param $value
+		 */
+		public static function Set($path, $value){
+			if ( $path ) {
+
+				$block = self::$_Data;
+
+				$path = explode('/', $path);
+
+				foreach ($path as $bit){
+
+				}
+
+			}
+
+		}
+
+		/** Untested but logic is good
+		 * Check to insure that a block is already present
+		 * @param $path
+		 *
+		 * @return bool
+		 */
+		public static function exists($path){
+			if(self::Get($path)){
+				return true;
+			}
+
+			return false;
+		}
+	}
+}

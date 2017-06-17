@@ -1,0 +1,58 @@
+<?php
+namespace core\modules\users {
+
+
+	/** TODO
+	 * Class user - is used as a factory to Create, Load, Edit, Remove users from the BD.
+	 * Load - Collects the user From the DB and returns it as a useful object
+	 * Create - Creates a new User
+	 * Edit - updates the Database with the Currently Stored user Profile
+	 * Remove - Wipes the User from the DB
+	 * @package core\modules\users
+	 */
+	class user extends \core\moduleAbstract {
+
+		/**
+		 * @return array
+		 ***/
+		public static function __Info__() {
+			$info = array (
+			  'Name' => 'User',
+			  'Desc' => 'Basic user class',
+
+				// path to use @ ?a= , Optional uf no path is set it will just be used at module's files basename
+			  'path' => array (
+
+			  ),
+
+			  'permissions' => array ( // Permissions this module has
+
+			  ),
+
+			  'require' => array (
+
+			  )
+			);
+
+			return $info;
+		}
+
+		public static function Load($args) {
+			//print "ID:" . $args['id'];
+		}
+
+		/** TODO
+		 * How should installs be handled
+		 ***/
+		public static function __Install__() {
+
+		}
+
+		public function __construct() {
+			parent::__construct();
+
+		}
+
+	}
+}
+

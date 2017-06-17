@@ -1,0 +1,107 @@
+<?php
+
+namespace core {
+
+	/** Working : 7/13/2013
+	 * Interface moduleInterface
+	 * @package core
+	 */
+	interface moduleInterface {
+
+		public static function __Info__();
+
+		public static function __Install__();
+
+		public function _Default($Args);
+
+	}
+
+	/** Working : 7/13/2013
+	 * Interface eventInterface
+	 * @package core
+	 */
+	interface eventInterface extends moduleInterface {
+
+		public function update(\SplSubject $event);
+
+	}
+
+	/** Working : 7/13/2013
+	 * Class moduleAbstract
+	 * @package core
+	 */
+	abstract class moduleAbstract implements moduleInterface {
+
+
+		/**
+		 *
+		 */
+		public function __construct(){;
+		}
+
+		/** TODO
+		 * Overload function for calls when the method does not exist
+		 *
+		 * http://php.net/manual/en/language.oop5.overloading.php#object.call
+		 * @param array $args
+		 */
+		public function __call($name, $args) {
+			//print($name);
+			//print_r($args);
+		}
+
+
+		/** TODO
+		 * Destruction
+		 * http://php.net/manual/en/language.oop5.decon.php
+		 */
+		function __destruct() {
+
+
+		}
+
+		/** TODO
+		 * Core installer,
+		 * checks for module schema and if present installs it
+		 */
+		public static function __Install__(){
+
+		}
+
+		/** TODO
+		 * Core un-installer
+		 * checks for module schema and if was previously installed removes it
+		 */
+		public static function __unInstall__(){
+
+		}
+
+		/**
+		 *
+		 */
+		public function _Default($Args){
+			$this->__call("_Default", $Args);
+		}
+	}
+
+	/** Working : 7/13/2013
+	 * Class eventAbstract
+	 *
+	 * Class abastring for modules that need event driven actions using SPL observer patterns
+	 * @package core
+	 */
+	abstract class eventAbstract extends moduleAbstract implements eventInterface, \SplObserver {
+
+
+		/**
+		 * Observer action
+		 *
+		 * @param \SplSubject $event
+		 */
+		public function update(\SplSubject $event){
+			//print "test//";
+		}
+
+
+	}
+}

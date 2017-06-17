@@ -1,0 +1,64 @@
+<?php
+namespace core\modules\Game {
+
+
+	/** TODO
+	 *
+	 */
+	class Registration extends \core\moduleAbstract {
+
+		/**
+		 *
+		 * @return array
+		 *
+		 ***/
+		public static function __Info__() {
+			$info = array (
+				'Name' => 'Registration',
+				'Desc' => 'Registration & Logins for game client',
+
+				// path to use @ ?a= , Optional uf no path is set it will just be used at module's files basename
+				'path' => array (
+					'Submit' => 'Registration/Submit',
+					'Create' => 'Registration/Create',
+				),
+
+				'permissions' => array ( // Permissions this module has
+
+				),
+
+				'require' => array (
+
+				)
+			);
+
+			return $info;
+		}
+
+		public function Create(){
+			print "New User";
+		}
+
+		public function Submit(){
+			print "testing User";
+		}
+
+		public static function Load($args) {
+			//print "ID:" . $args['id'];
+		}
+
+		/** TODO
+		 * How should installs be handled
+		 ***/
+		public static function __Install__() {
+
+		}
+
+		public function __construct() {
+			parent::__construct();
+
+		}
+
+	}
+}
+

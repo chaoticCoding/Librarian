@@ -1,0 +1,28 @@
+<?php
+
+//Always ensure that the  global is loaded
+global $schema;
+
+$schema['user'] = array(
+  'description' => 'The base for form processing',
+  'fields' => array(
+    'nid'       => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+    'vid'       => array('type' => 'int', 'unsigned' => TRUE, 'not null' => TRUE,'default' => 0),
+    'type'      => array('type' => 'varchar','length' => 32,'not null' => TRUE, 'default' => ''),
+    'language'  => array('type' => 'varchar','length' => 12,'not null' => TRUE,'default' => ''),
+    'title'     => array('type' => 'varchar','length' => 255,'not null' => TRUE, 'default' => ''),
+  ),
+  'indexes' => array(
+    'node_changed'        => array('changed'),
+  ),
+  'unique keys' => array(
+    'vid' => array('vid'),
+  ),
+  'foreign keys' => array(
+    'node_revision' => array(
+      'table' => 'node_field_revision',
+      'columns' => array('vid' => 'vid'),
+     ),
+   ),
+  'primary key' => array('nid'),
+);

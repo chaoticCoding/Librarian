@@ -1,0 +1,63 @@
+<?php
+
+namespace core\modules {
+	use core\HTML\FORMS;
+	/**
+	 * Class users - Serves as a Central hub all users
+	 * Functions for accessing or manipulating user information should be built from here.
+	 *
+	 * @package core\modules
+	 */
+	class users extends \core\moduleAbstract {
+
+		/** TODO Testing
+		 * Module Info Must be present for use
+		 * @return array
+		 ***/
+		public static function __Info__() {
+			$info = array (
+                'Name' => 'Users',
+                'Desc' => 'Basic user class',
+
+                // path to use @ ?a= , Optional uf no path is set it will just be used at module's files basename
+                'path' => array (
+                    '_Default' => 'user',
+                    'profile' => 'users/<id:(\d+)>', // TODO Extend to array for functions?
+                    'register' => 'user/register'
+                ),
+
+                'permissions' => array ( // Permissions this module has
+
+                ),
+
+                'require' => array (
+                'users\user'
+                )
+			);
+
+			return $info;
+		}
+
+
+		public function register() {
+
+			$form = FORMS::create("test");
+			$form->createField("user","text");
+			$form->createField("users","text",5);
+			$form->user(['ID' => 10, 'label' => 'ID', 'validation'=> '\d+'], ['style'=>"color:#ffffff", 'placeholder' => 'ID']);
+
+			print($form->render());
+		}
+
+		public function profile($args) {
+			users\user::load($args);
+		}
+
+		public function __construct() {
+			parent::__construct();
+
+		}
+
+	}
+}
+

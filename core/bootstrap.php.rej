@@ -1,0 +1,11 @@
+diff a/public_html/core/bootstrap.php b/public_html/core/bootstrap.php	(rejected hunks)
+@@ -309,7 +309,8 @@
+ 
+ 					                        if (isset($info['listen'])) {
+ 
+-                                                print("<!-- " .$class['name'] . ' has requested to join listeners -->\n');
++                                                print("<!-- " .$class['name'] . " has requested to join listeners -->\n");
++						                        
+ 						                        $lis = new listener($this->$class['name'], $info['listen']);
+ 						                        $this->addtoListeners($lis);
+ 					                        }

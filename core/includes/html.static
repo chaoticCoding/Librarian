@@ -1,0 +1,71 @@
+<?php
+
+namespace core {
+
+	/**
+	 * Class HTML
+	 * @package core
+	 */
+	class HTML extends \core\coreStatic {
+
+
+		/**
+		 * Core function for rendering HTML tags
+		 *
+		 * @param      $tag : H1 H2 div ....
+		 * @param      $Attributes : width height, style ....
+		 * @param      $inner
+		 * @param      $special
+		 *
+		 * @param bool $closingTag
+		 *
+		 * @return string
+		 ***/
+		public static function render($tag, $Attributes = [], $inner = "", $special = FALSE, $closingTag = TRUE) {
+			$html = "";
+
+			$html .= self::renderOpening($tag, $Attributes);
+
+			if ($special === TRUE) {
+				$html .= htmlspecialchars($inner);
+			}
+			else {
+				$html .= $inner;
+			}
+
+			if ($closingTag === TRUE) {
+				$html .= self::renderClosing($tag);
+			}
+
+			return $html;
+		}
+
+		/**
+		 * @param       $tag
+		 * @param array $Attributes
+		 *
+		 * @return string
+		 ***/
+		public static function renderOpening($tag, $Attributes = []) {
+			$html = "<$tag";
+
+			foreach ($Attributes as $Attribute => $value) {
+				if(isset($value) && $Attribute != "" && $value != '')
+				$html .= " $Attribute='$value'";
+			}
+
+			$html .= ">";
+
+			return $html;
+		}
+
+		/**
+		 * @param $tag
+		 *
+		 * @return string
+		 ***/
+		public static function renderClosing($tag) {
+			return "</$tag>";
+		}
+	}
+}

@@ -1,0 +1,366 @@
+<?php
+namespace core\HTML {
+
+	/**
+	 * Form factory
+	 * @package core\HTML
+	 */
+	class FORMS extends \core\coreStatic{
+
+		/**
+		 * Serves as a factory for creating forms
+		 ***/
+		public static function create ($name, $duration = 3600){
+
+			return new FORMS\FORM($name, $duration);
+		}
+
+		/**
+		 * returns an already open form by name
+		 *
+		 * @param $name
+		 */
+		public static function getFormbyName ($name){
+
+		}
+
+		/**
+		 * returns an already open form by ID
+		 *
+		 * @param $ID
+		 */
+		public static function getFormbyID ($ID){
+
+		}
+
+
+
+
+	}
+
+
+}
+
+/**
+ * Creates FROM as a sub of FORMS
+ */
+namespace core\HTML\FORMS {
+
+	/**
+	 * Class FORM
+	 * @package core\HTML\FORMS
+	 */
+	class FORM extends \core\coreStatic {
+		private $_ID;
+		private $_key;
+		private $_name;
+
+		private $_validUntil; // when the form is no longer valid for submission
+
+		private $_action; // Defaults to use Self address to submit all forms and it should be the bass path.
+		private $_method = 'post'; //Defaults to use post to send submitted forms doubtful this will ever need to change.
+
+		private $_Fields; // Container of fields this form
+		private $_NextMicro = 0.0;
+
+		/** TODO
+		 * Constructor
+		 *
+		 * @param     $name - Name of form
+		 * @param int $duration - how long should the form be allow to be submitted, in seconds
+		 */
+		public function __construct($name, $duration = 3600){
+			$this->_name = $name;
+			$this->_validUntil = $duration + time();
+			$this->_key = \core\UUID::v4();
+
+			$this->setAction( htmlentities($_SERVER['PHP_SELF'])); // Sets default submit path.
+			$key = $this->createField("key", "hidden", -100, -0.99999); // Stick submit at end of every newly created form
+			$key->setValue($this->_key);
+			$sub = $this->createField("submit", "submit", 100, 0.99999); // Stick submit at end of every newly created form
+
+			return $this->_ID;
+		}
+
+		/**
+		 * Changes submitted path.
+		 *
+		 * @param $action
+		 */
+		public function setAction($action){
+			$this->_action = $action;
+		}
+
+		public function setMethod($method){
+			$this->_method = $method;
+
+		}
+
+		/**
+		 * Adds new field to form
+		 *
+		 * @param string $Name
+		 * @param string $Type
+		 * @param int $weight
+		 * @param float $microWeight
+		 *
+		 * @return FORM\field
+		 */
+		public function createField($Name, $Type, $weight = 10, $microWeight = 0.0) {
+			// if MicroWeight is not used then load it from the next position
+			if ($microWeight == 0) {
+				$microWeight = $this->_NextMicro += -.1;
+			}
+
+			return $this->_Fields[$Name] = new FORM\field($Type, $Name, $weight, $microWeight);
+		}
+
+		/** TODO
+		 * Stores form white list and Validation for submition
+		 */
+		public function store(){
+
+		}
+
+		/** TODO
+		 * test each form field against stored validation
+		 *
+		 * @return array of field that failed validation
+		 */
+		public function validate(){
+
+			return array();
+
+		}
+
+		/** TODO
+		 * Renders Form information including hidden field for verification
+		 */
+		public function render(){
+			$tAttributes = [
+			  'name' => $this->_name,
+			  'id'   => $this->_ID,
+			  'method'=> $this->_method,
+			  'action'=> $this->htmlentities($this->_action)
+			];
+
+
+			$r = array();
+			// Loops though each set field and grabs the Rendered HTML then stores it in a array based on weight
+			foreach($this->_Fields as $field){
+				$w = $field->getWeight();
+				$r[$w] = $field->render();
+			}
+
+			// Sorts Array based on key, Weight is set to key each field will line up by weight
+			ksort($r);
+
+			$html = "";
+
+			// Writes the sorted HTML into the return $html block
+			foreach($r as $ren){
+				$html .= $ren;
+			}
+
+			$html = \core\HTML::render("form", $tAttributes,$html );
+
+
+			return $html;
+		}
+
+		/** TODO
+		 * if called assume that they are trying to set the value of a field so call the field.
+		 * @param $Name
+		 * @param $args
+		 */
+		public function __call($Name, $args){
+			//print_r( $args );
+			if(isset($this->_Fields[$Name])){
+				$this->_Fields[$Name]->set($args);
+			}
+			//$this->_Fields[$Name]
+		}
+	}
+}
+
+/** TODO micro-weighting
+ *
+ * Creates FROM as a sub of FORMS
+ */
+namespace core\HTML\FORMS\FORM {
+
+	class field extends \core\coreStatic {
+		use \core\microWeight; // add traits for micro weighting
+
+		private $type = "";
+		private $name = "";
+		private $ID = "";
+
+		private $label = "";
+
+		private $defaultValue = "";
+
+		private $list = array();
+		private $Attributes = array();
+		private $validation = "";
+
+		private $value = "";
+
+		/**
+		 * @param        $type
+		 * @param string $name
+		 * @param string $ID
+		 * @param int	 $weight
+		 * @param float	 $micro
+		 * @param string $label
+		 * @param string $defaultValue
+		 * @param array  $list
+		 * @param array  $Attributes
+		 * @param string $validation
+		 */
+		public function __construct($type, $name = "", $weight = 10, $micro = 0.0, $ID = "", $label = "", $defaultValue = "", $list = [], $Attributes = [], $validation = ""){
+			$this->setType($type);
+			$this->setName($name);
+			$this->setID($ID);
+			$this->setDefaultValue($defaultValue);
+			$this->setList($list);
+			$this->setAttributes($Attributes);
+			$this->setValidation($validation);
+
+			$this->setWeight($weight, $micro);
+
+		}
+
+		/**
+		 * @param $type
+		 */
+		public function setType($type){
+			$this->type = $type;
+		}
+
+		/**
+		 * @param $name
+		 */
+		public function setName($name){
+			$this->name = $name;
+		}
+
+		/**
+		 * @param $id
+		 */
+		public function setID($id){
+			$this->ID = $id;
+		}
+
+		/**
+		 * @param $label
+		 */
+		public function setLabel($label){
+			$this->label = $label;
+		}
+
+		/**
+		 * @param $defaultValue
+		 */
+		public function setDefaultValue($defaultValue){
+			$this->defaultValue = $defaultValue;
+		}
+
+		/**
+		 * @param $list
+		 */
+		public function setList($list){
+			$this->list = $list;
+		}
+
+		/**
+		 * @param $Attributes
+		 */
+		public function setAttributes($Attributes){
+			$this->Attributes = $Attributes;
+		}
+
+		/**
+		 * @param $validation
+		 */
+		public function setValidation($validation){
+			$this->validation = $validation;
+		}
+
+		/**
+		 * @param $value
+		 */
+		public function setValue($value){
+			$this->value = $value;
+		}
+
+		/**
+		 * function for setting multiply values from array;
+		 * @param $args
+		 */
+		public function set($args){
+
+			foreach($args[0] as $key => $value ){
+				//print($key);
+				//$key = $pram[0];
+				//$value = $pram[1];
+
+
+				if(isset($key)) {
+					//print($key . ":" . $value);
+					$this->$key = $value;
+				}
+			}
+			if(isset($args[1])) {
+				$this->Attributes = $args[1];
+			  }
+		}
+
+		/** TODO - Testing
+		 * if validation is set then test current value vs the regex stored in validation
+		 *
+		 * @return null - if validation fails
+		 * @return true - if validation is not set
+		 * @return $matches is pattern test true.
+		 */
+		public function validate(){
+
+			if(isset($this->validation)) {
+				if (preg_match("/^$this->validation$/", $this->value, $matches)) {
+					return $matches;
+
+				} else {
+					return NULL;
+				}
+			}
+			return true;
+		}
+
+		/** TODO
+		 * @return string - HTML generated
+		 */
+		public function render(){
+			//creates a temp array merging extra attribs with standard data
+			$tAttributes = array_merge([
+				'type' => $this->type,
+				'name' => $this->name,
+				'id'   => $this->ID,
+				'value'=> $this->value
+			], $this->Attributes);
+
+			if($this->validation != ""){
+				$tAttributes['pattern'] = $this->validation;
+			}
+
+			//Renders the input area
+			$fragmentHTML = \core\HTML::render("input",$tAttributes,"",false,false);
+
+			//if there is a lbl renders out a div with the label
+			if(isset($this->label) && $this->label != ""){
+				$fragmentHTML = \core\HTML::render("div", ['id' => 'lbl'], $this->label . $fragmentHTML, false, true);
+			}
+			return $fragmentHTML . "\n";
+
+		}
+	}
+}

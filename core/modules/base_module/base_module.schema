@@ -1,0 +1,4 @@
+<?php
+
+//Always ensure that the  global is loaded
+global $schema;

@@ -1,0 +1,101 @@
+<?php
+
+namespace core\cache {
+
+    use core\errors;
+
+    /** Working /7/16/2016
+     * Class cache coreMudle for APC Cache
+     * @package core
+     ***/
+    class APC extends cacheEngine {
+        public static $_info = array(
+            'name' => "APC",
+        );
+
+        private $config = array(
+            'namespace' => '',
+        );
+
+        /** Working /7/16/2016
+         * Checks to see if there is an existing cache file
+         *
+         * @param $key
+         * @return bool|\string[]
+         ***/
+        public function Exists($key) {
+            return \apc_exists($this->config['namespace'] . '\'' . $key);
+        }
+
+        /** Working /7/16/2016
+         * Adds new value to APC
+         *
+         * http://php.net/manual/en/function.apc-add.php
+         *
+         * @param $key
+         * @param $value
+         * @return bool
+         ***/
+        public function Add($key, $value) {
+            return \apc_add($key, $value);
+        }
+
+        /** Working /7/16/2016
+         * Sets value to APC
+         *
+         * http://php.net/manual/en/function.apc-store.php
+         *
+         * @param $key
+         * @param $value
+         * @param int $TTL in sec
+         * @return array|bool
+         */
+        public function Store($key, $value, $TTL = 120) {
+            return \apc_store($key, $value, $TTL);
+
+        }
+
+        /** Working /7/16/2016
+         * Gets value stored in APC
+         *
+         * @param $key
+         * @return mixed|null
+         */
+        public function Get($key) {
+            if ($arr = \apc_fetch($key)) {
+                return ($arr);
+            }
+
+            return null;
+        }
+
+        /** Working /7/16/2016
+         * Removes key
+         *
+         * http://php.net/manual/en/function.apc-delete.php
+         *
+         * @param $key
+         * @return bool|\string[]
+         */
+        public function Delete($key) {
+
+            return \apc_delete($key);
+
+        }
+
+        public function Purge() {
+
+        }
+
+        public static function __isUseable(){
+            try {
+                if (extension_loaded('apc') && ini_get('apc.enabled')) {
+                    return true;
+                }
+            } catch (\Exception $e ) {
+
+                return false;
+            }
+        }
+    }
+}

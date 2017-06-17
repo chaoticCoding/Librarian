@@ -1,0 +1,127 @@
+
+<html>
+<head>
+	<title>Kite</title>
+</head>
+<body style='margin:0px; width:100%; position:relative;
+height:auto;
+min-height:100%'>
+<div id='gamewindow' style='position:relative; width:100%; height:100%; overflow:hidden;'>
+	<canvas id="canvas" width="200" height="200" style='background-color:rgba(255,200,255,1);'></canvas>
+</div>
+</body>
+<script>
+	var Screen = [600,600];
+	var Window = document.getElementById("canvas").getContext("2d");
+	var TileStats = [0,[],[],[]];
+	var Tiles = 4;
+	var Speed = 10; //30*10/1000
+	var Score = 0;
+
+	window.onresize = function(e){
+		resizeScreen()
+	};
+
+	function resizeScreen(){
+		Screen = [document.body.offsetWidth, document.body.offsetHeight];
+		document.getElementById('gamewindow').style.width=Screen[0]+"px";
+		document.getElementById('gamewindow').style.Height=Screen[1]+"px";
+		document.getElementById('canvas').width=Screen[0];
+		document.getElementById('canvas').height=Screen[1]
+	}
+
+	function diceRoll(n) {
+		return(Math.ceil(Math.random() * n))
+	}
+
+	function init(){
+		resizeScreen();
+		spawnTile(0);
+		moveTile()
+	}
+
+	function spawnTile(offset){
+		state=diceRoll(Tiles)-1;
+		dborder=3;
+		size=[Screen[0]/Tiles,Screen[1]/Tiles];
+		for (i=0;i<Tiles;i++){
+			name="tile"+TileStats[0];
+			//rgb=[diceRoll(255),diceRoll(255),diceRoll(255)]
+			if (i==state){
+				color="rgba(0,0,0,1)";
+				dclick="Speed+=0.1;this.style.backgroundColor='rgba(255,255,255,1)'";
+				a=true
+			}else{
+				color="rgba(255,255,255,1)";
+				dclick="alert(Score)";
+				a=false
+			}
+			dwidth=(size[0]-(dborder*2));
+			dheight=(size[1]-(dborder*2));
+			dleft=(size[0]*i);
+			dtop=(-((size[1])-offset));
+			//document.getElementById("gamewindow").innerHTML+="<div id='"+name+"' style='position:absolute; background-color:"+color+"; width:"+dwidth+"px; height:"+dheight+"px; left:"+dleft+"px; top:"+dtop+"px; border-width:"+dborder+"px; border:outset; border-color:rgba(100,100,100,1)' onmousedown="+dclick+"></div>"
+			TileStats[0]++;
+			TileStats[2].push(name);
+			TileStats[3].push([dwidth,dheight,dleft,dtop,color,a])
+		}
+	}
+
+	function render(){
+		document.getElementById('canvas').width=Screen[0];
+		//Window.clearRect(0,0,Screen[0],Screen[1]);
+		for (i=0;i<TileStats[2].length;i++){
+			dwidth=TileStats[3][i][0];
+			dheight=TileStats[3][i][1];
+			dleft=TileStats[3][i][2];
+			dtop=TileStats[3][i][3];
+			color=TileStats[3][i][4];
+			state=TileStats[3][i][5];
+
+			Window.fillStyle = color;
+			Window.fillRect(dleft,dtop,dwidth,dheight);
+		}
+	}
+
+	function moveTile(){
+		setTimeout(function(){
+			a=0;
+			for (i=0;i<TileStats[2].length;i++){
+				name=TileStats[2][i];
+				//obj=document.getElementById(name)
+				TileStats[3][i][3]+=Speed;
+				dtop=TileStats[3][i][3];
+				//obj.style.top=dtop+'px'
+				if (dtop<0){
+					a=1
+				}else if (dtop>Screen[1]){
+					if (dtop=TileStats[3][i][5]==true){
+						//alert(Score)
+					}
+					TileStats[1].push(name)
+				}
+			}
+			if (a==0){
+				spawnTile((TileStats[3][TileStats[3].length-1][3]))
+			}
+			if (TileStats[1].length>0){
+				removeTile()
+			}
+			render();
+			moveTile()
+		},30)
+	}
+
+	function removeTile(){
+		while (TileStats[1].length>0){
+			id=TileStats[2].indexOf(TileStats[1][0]);
+			//document.getElementById(TileStats[1][0]).remove()
+			TileStats[2].splice(id,1);
+			TileStats[3].splice(id,1);
+			TileStats[1].splice(0,1)
+		}
+	}
+
+	init()
+</script>
+</html>

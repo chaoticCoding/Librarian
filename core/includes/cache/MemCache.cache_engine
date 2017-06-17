@@ -1,0 +1,106 @@
+<?php
+
+namespace core\cache {
+	
+	/**
+	 * Class cache coreMudle for MemCache
+	 * @package core
+	 ***/
+	class MemCache extends cacheEngine {
+		
+		/** TODO Returns information about this module
+		 *
+		 */
+		public static $_info = array(
+			'name' => "MemCache",
+		
+		);
+		
+		/** TODO
+		 *
+		 * @param $path
+		 */
+		public function __construct($path) {
+			
+		}
+		
+		/** TODO
+		 *
+		 * @param $key
+		 * @return bool|\string[]
+		 ***/
+		public function Exists($key) {
+			
+		}
+		
+		/** TODO
+		 *
+		 * @param $key
+		 * @param $value
+		 * @return bool
+		 ***/
+		public function Add($key, $value) {
+			
+		}
+		
+		/** TODO
+		 *
+		 * @param $key
+		 * @param $value
+		 * @param int $TTL in sec
+		 * @return array|bool
+		 */
+		public function Store($key, $value, $TTL = 120) {
+			
+		}
+		
+		/** TODO
+		 *
+		 * @param $key
+		 * @return mixed|null
+		 */
+		public function Get($key) {
+			
+		}
+		
+		/** TODO
+		 *
+		 * @param $key
+		 * @return bool|\string[]
+		 */
+		public function Delete($key) {
+			
+		}
+		
+		/** TODO
+		 *
+		 */
+		public function Purge() {
+			
+		}
+		
+		/** TODO
+		 *
+		 */
+		public static function __isUseable(){
+			try {
+				// tests to see if class exists
+				if (class_exists('Memcache')) {
+					// if it does attemps to load a new instance and connect
+                	$memcache = new Memcache;
+                	$isMemcacheAvailable = @$memcache->connect('localhost');
+
+					// if connection is sucessful return true
+					if ($isMemcacheAvailable) {
+						return true;
+					}else{
+						return false;
+					}
+				}
+
+			} catch (Exception $e) { // error caught so something when really wrong and its not available
+				return false;
+			}
+		}
+	}
+}

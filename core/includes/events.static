@@ -1,0 +1,84 @@
+<?php
+
+namespace core {
+
+	/** Working 7/16/2016
+	 * Class Input
+	 * Input Processor
+	 *
+	 * @package core
+	 */
+	class events extends \core\coreStatic {
+		// storage for event dispatcher
+		private static $_Dispatcher;
+
+		// storage for events to be dispatched
+		private static  $_Events = [];
+
+		/** Working 7/16/2016
+		 * Public constructor will be called on creation
+		 *
+		 * @param array $info
+		 ***/
+		public static function __Init__(  $info = null ) {
+
+			if(isset($info) ){ // TODO Add Error correction
+				self::$_Events = $info;
+			}
+		}
+
+		/** Working 7/16/2016
+		 * @param $EventDispatcher
+		 */
+		public static function registerDispatcher(&$EventDispatcher){
+			if (method_exists($EventDispatcher, 'newEvent')) {
+				print("<!-- new event dispatcher -->\n");
+				self::$_Dispatcher = $EventDispatcher;
+
+			} else {
+				var_dump($EventDispatcher);
+				die ("unable to create Event dispatcher!");
+			}
+		}
+
+		/** Working 7/16/2016
+		 *
+		 * Trigger events
+		 *
+		 ***/
+		public static function triggerEvents() {
+			if (method_exists(self::$_Dispatcher, 'newEvent')) {
+
+				if (isset(self::$_Events)) { // TODO Add Error correction
+					foreach (self::$_Events as $event => $action) {
+						// seperates boolean actions form URI actions
+
+						if (is_bool($action)) {
+							//print("<!-- Event '$event'' Triggered -->\n");
+
+							self::$_Dispatcher->newEvent($event, $action);
+
+						} else {
+							//print("<!-- Event '$event' called -->\n");
+							//print("<!-- Action '$action' -->\n");
+
+							if (isset($_GET[$action])) {
+
+								$actionURI = $_GET[$action];
+
+								if (isset($actionURI)) {
+
+									//print("<!-- Event args: '$actionURI' -->\n");
+									self::$_Dispatcher->newEvent($event, $actionURI);
+								}
+							}
+						}
+					}
+				}
+			}else{
+
+				die ("unable to trigger Event!");
+			}
+		}
+	}
+}

@@ -1,0 +1,15 @@
+<?php
+
+/**
+ *
+ */
+namespace core {
+	/** Static class for Rendering Engine
+	 *
+	 * Class inputManager
+	 */
+	class RenderEngine extends \core\coreStatic
+	{
+
+	}
+}

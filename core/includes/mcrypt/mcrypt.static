@@ -1,0 +1,64 @@
+<?php
+
+namespace core;
+/**
+ * TODO overhaul to allow different encryption types
+ *
+ * Basic Encryption class
+ *
+ * Class mcrypt
+ */
+class mcrypt extends \core\coreInc {
+
+	// Stored Encryption Key
+	private static $_Settings;
+
+	/**
+	 * Init needs to be called before use as it sets the Encryption key
+	 * @param $settings
+	 */
+	public static function __Init__($settings){
+		self::$_Settings = $settings;
+
+	}
+
+	/**
+	 * Encrypts Data with RIJNDAEL_128
+	 *
+	 * @param $string
+	 * @param $type (string) | default = specs and alternitive encyption type
+	 * @return string
+	 */
+	public static function Encrypt($string, $type = 'default') {
+
+		/// Creates padding to fill in block, PHP does not do this by default and is needed for compatibility with C#
+		$block = mcrypt_get_block_size(MCRYPT_RIJNDAEL_128, MCRYPT_MODE_ECB);
+		$padding = $block - (strlen($string) % $block);
+		$string .= str_repeat(chr($padding), $padding);
+
+		$encrypted_string = mcrypt_encrypt(
+			MCRYPT_RIJNDAEL_128,
+			self::$_Settings[$type]['key'],
+			$string,
+			MCRYPT_MODE_ECB
+		);
+
+		return base64_encode($encrypted_string);
+	}
+
+	/**
+	 * Decrypts Data stored with RIJNDAEL_128
+	 *
+	 * @param $encrypted_string
+	 * @param $type (string) | default = specs and alternative encryption type
+	 * @return string
+	 */
+	public static function Decrypt($encrypted_string, $type = 'default') {
+		return mcrypt_decrypt(
+			MCRYPT_RIJNDAEL_128,
+			self::$_Settings[$type]['key'],
+			base64_decode($encrypted_string),
+			MCRYPT_MODE_ECB
+		);
+	}
+}

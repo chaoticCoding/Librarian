@@ -1,0 +1,221 @@
+<?php
+
+namespace core {
+	/**  TODO - Inprogress
+	 * Class Database, used for database abstraction
+	 ***/
+	class Database extends \core\coreStatic {
+		//Storage for database object
+		private static $db_link = array();
+
+		private static $databaseInfo = array();
+
+		/** TODO Returns information about this module
+		 *
+		 */
+		public static $_info = array(
+			'name' => "Database",
+		);
+
+
+		/**  Working 7/16/2016
+		 *
+		 * Public constructor will be called on creation
+		 *
+		 * takes list of connections to and preps for new connections
+		 *
+		 * @param array $info
+		 ***/
+		public static function __Init__( array $info = null ) {
+			//print "New Database";
+
+			// if there is db connection info preped load now!
+			if(isset($info)){ // TODO Add Error correction
+				foreach( $info as $k => &$db ){
+					self::addConnectionInfo($k, $db);
+				}
+			}
+		}
+
+		/** TODO adding additional validation
+		 * loads in new connection details overwriting previous details, used to add additional connection information
+		 *
+		 * @param $database
+		 * @param array $info
+		 ***/
+		public static function addConnectionInfo($database, array $info){
+			self::$databaseInfo[$database] = $info;
+		}
+
+		/** Working 7/16/2016
+		 *
+		 * opens connection
+		 *
+		 * @param $database
+		 * @return bool
+		 ***/
+		public static function openConnection($database = 'default'){
+			if (self::$db_link[$database]) { //there is already an opened connection so send it back
+				return self::$db_link[$database];
+
+			} else { // try to open a new connection
+
+				try {
+
+					if(self::$databaseInfo[$database]) { //TODO check to make sure that there is already settings for this database
+
+						// pulls it to a local just to make it a bit cleaner
+						$d = self::$databaseInfo[$database];
+
+						//creates a new PDO object using the found settings
+						self::$db_link[$database] = new \PDO("mysql:host=" . $d['host'] . ";port=" . $d['port'] . ";dbname=" . $d['database'] , $d['username'], $d['password']);
+
+						// sets safe errors so any problems are given a chance to be handled before the script fails
+						self::$db_link[$database]->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+
+						// requires PDO to use native Prepared statemnets thus preventing 1st tear SQL injection
+						self::$db_link[$database]->setAttribute(\PDO::ATTR_EMULATE_PREPARES, false);
+
+						return self::$db_link[$database];
+
+					} else { // NO connection details where found
+						self::exception_handler( "No Connection information for Database");
+
+						return false;
+
+					}
+
+				} catch ( \PDOException $e ) { // failure to open PDO connection
+					self::exception_handler( $e->getMessage());
+
+					return FALSE;
+				}
+			}
+		}
+
+		/** Working 7/16/2016
+		 *
+		 * removes reference to object, to allow PHP garbage collection to close connection.
+		 * @param $database
+		 ***/
+		public static function closeConnection( $database = 'default' ) {
+			self::$db_link[$database] = null;
+
+		}
+
+		/** TODO Return errors to Error logger
+		 * @param $exception
+		 ***/
+		public static function exception_handler( $exception ) {
+			// Output the exception details
+			//$response['error'] = $e->getMessage(); // redirect error to local
+
+			die('PDO exception: '. $exception);
+
+		}
+
+		/** TODO testing
+		 * Injection safe query returns Fetched results
+		 *
+		 * @param $sql
+		 * @param array $args
+		 * @param $database
+		 *
+		 * @returns false if the query could bot be run, else returns the results
+		 ***/
+		public static function Results($sql, array $args = null, $database = "default"){
+
+			$Prepared_Stmt = self::Query($sql, $args, $database);
+
+			if ( $Prepared_Stmt ) {
+				if ( $Prepared_Stmt->rowCount() > 0 ) {
+
+					$results = $Prepared_Stmt->fetchAll( \PDO::FETCH_ASSOC );
+
+					return $results;
+				} else {
+					return false;
+				}
+			}else {
+				return false;
+			}
+
+		}
+
+		/** TODO testing
+		 * Injection safe query that returns count affected rows
+		 *
+		 * @param $sql
+		 * @param array $args
+		 * @param $database
+		 *
+		 * @returns false if the query could not be run, returns rows effected if run completed ok
+		 ***/
+		public static function Affected($sql, array $args = null, $database = "default") {
+
+			$Prepared_Stmt = self::Query( $sql, $args, $database );
+
+			if ( $Prepared_Stmt ) {
+
+				$results = $Prepared_Stmt->rowCount();
+
+				return $results;
+			}else {
+				return false;
+			}
+
+		}
+
+		/** TODO testing
+		 * Injection Query function, Returns SQL results or null
+		 *
+		 * @param $sql
+		 * @param array $args
+		 * @param string $database
+		 * @return bool
+		 ***/
+		public static function Query($sql, array $args = null, $database = "default"){
+
+			// Ensures that Database link as already been made if not opens new connection
+			if ( !self::$db_link[$database] ) {
+				self::openConnection($database);
+
+			}
+
+			// Purges last results
+			self::$databaseInfo[$database]['response'] = null;
+
+			try {
+
+				// Prepares statement using ::$field, this used to prevent SQL Injection
+				$Prepared_Stmt = self::$db_link[$database]->prepare($sql);
+
+				if(isset($args)) { // binds values to place holders if values are present
+					$Prepared_Stmt->bindValue($args);
+				}
+
+				$Prepared_Stmt->execute(); // executes query
+
+				// TODO Stores last results for possible caching?
+				self::$databaseInfo[$database]['response'] = $Prepared_Stmt;
+
+				return $Prepared_Stmt; // returns connection object
+
+			} catch ( \PDOException $e ) { // TODO Error handling
+				self::exception_handler( $e->getMessage() ) ;
+
+				return false;
+			}
+		}
+
+		/** TODO
+		 * installs schema for $schema
+		 *
+		 * @param $name
+		 */
+		public static function installSchema($name){
+
+		}
+
+	}
+}

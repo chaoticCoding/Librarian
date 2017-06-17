@@ -1,0 +1,22 @@
+<?php
+//Always ensure that the  global is loaded
+global $schema;
+
+$schema['html_forms'] = array(
+  'description' => 'The base for form processing',
+  'fields' => array(
+    'frmID'       => array('type' => 'serial', 'unsigned' => TRUE, 'not null' => TRUE),
+    'data'        => array('type' => 'text', 'unsigned' => TRUE, 'not null' => TRUE,'default' => 0),
+    'validuntil'  => array('type' => 'timestamp','length' => 32,'not null' => TRUE, 'default' => ''),
+  ),
+  'indexes' => array(
+    'frmID'        => array('changed'),
+  ),
+  'unique keys' => array(
+    'frmID' => array('vid'),
+  ),
+  'foreign keys' => array(
+
+   ),
+  'primary key' => array('frmID'),
+);

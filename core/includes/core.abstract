@@ -1,0 +1,286 @@
+<?php
+
+namespace core {
+
+	/**
+	 * Class coreStatic
+	 * @package core
+	 */
+	abstract class coreStatic implements coreStaticInterface {
+		/**
+		 * generic class information example
+		 * Disabled to be used as an example only
+		 */
+		public static function __info__() {
+			$info = array(
+				//'name' => "cacheEngine",
+				//'listen' => 'eventDispatcher',
+				//'dispatcher' => true,
+				'bootSettings' => array(
+					'skip' => false, // do not init this in anyway
+					'callInit' => true, // call init as if it was a static function
+					'callAsNew' => false, // call as new for class construction
+					'StartSubclasses' => false // allow sub classes to be started if not only the 1st class will be loaded
+				),
+			);
+
+			//TODO merge local settings with parent info
+			if(isset(static::$_info)){
+				$info = array_merge($info, static::$_info);
+			}
+
+			return $info;
+		}
+	}
+
+	/**
+	 * Class coreInc
+	 * @package core
+	 */
+	abstract class coreInc implements coreIncludeInterface {
+		// As core objects are going to be only created once we are adding singleton patterns
+		static $_InstanceOf = null;
+
+		// Storage for settings
+		private $_settings = [];
+
+		/**
+		 * generic class information example
+		 * Disabled to be used as an example only
+		 */
+		public static function __info__() {
+			$info = array(
+				//'name' => "cacheEngine",
+				//'listen' => 'eventDispatcher',
+				//'dispatcher' => true,
+				'bootSettings' => array(
+					'skip' => false, // do not init this in anyway
+					'callInit' => false, // call init as if it was a static function
+					'callAsNew' => true, // call as new for class construction
+					'StartSubclasses' => false // allow sub classes to be started if not only the 1st class will be loaded
+				),
+			);
+
+			//TODO merge local settings with parent info
+			if(isset(static::$_info)){
+				$info = array_merge($info, static::$_info);
+			}
+
+			return $info;
+
+		}
+
+
+		/** TODO working but will not create singleton correct
+		 * basic constructor for attaching settings to core Modules
+		 * @param null $Settings
+		 */
+		function __construct( $Settings = null ) {
+
+
+			if(!is_null($Settings)){
+				$this->_settings = $Settings;
+			}
+		}
+
+		/** TODO Broken - NONworking will not return correct instance
+		 * function for creating singletons for all core modules
+		 * @return mixed
+		 */
+		/*public static function getInstances($me = null) {
+
+			if(is_null( self::$_InstanceOf)) {
+				if (!is_null($me)) {
+					var_dump($me);
+					self::$_InstanceOf = $me;
+				}
+			}
+
+			//var_dump($me);
+
+			return self::$_InstanceOf;
+		}*/
+
+	}
+
+	/**
+	 * Class coreObserver
+	 * @package core
+	 */
+	abstract class coreObserver extends coreInc implements coreObserverInterface, \SplObserver {
+
+		/** TODO - Non-working because of being unable to get the correct instancing cannot call back to the module
+		 *
+		 * unified update system, so not every observer need to have class for regular events, broken because of instancing issue with coreInc being unable to find its own singleton correctly
+		 * Observer action
+		 *
+		 * @param \SplSubject $inputs
+		 */
+		public function update(\SplSubject $inputs) {
+			$event = $inputs->getEvent();
+
+			$cClass = get_class($this);
+
+			foreach($event as $e => $message) {
+				if($e != "update") {
+					print("<!-- $e : heard by $cClass -->\n");
+
+					if (method_exists($cClass, $e)) {
+						//var_dump($cClass::getInstances());
+
+
+						//$coreModule = $cClass::getInstances();
+						//var_dump($coreModule);
+						//$coreModule->$e($message);
+
+						//print("<!-- execute $e in $cClass  -->\n");
+						//$this->$e($message);
+						//TODO - $cClass is not the calling service needs to be a driver from bootstrap as SplObserver requires non static execution
+						//$cClass->$e($message);
+					}
+				}
+			}
+
+           // print($cClass);
+		}
+
+	}
+
+	/** Working 7/16/2016
+	 *
+	 * @package core
+	 */
+	abstract class cachedTrait {
+		use \core\microWeight;
+
+		private $_type = '';
+		private $_Trait = [];
+
+		private $_loaded = false;
+
+		/** Working 7/16/2016
+		 * @param $type
+		 */
+		public function __construct( $type ) {
+			$this->_type = $type;
+
+		}
+
+		/** Working 7/16/2016
+		 * @param        $key
+		 * @param string $value
+		 */
+		public function Set($key, $value = '') {
+			$this->_load();
+			$this->_Trait[$key] = $value;
+
+		}
+
+		/** Working 7/16/2016
+		 * @param $key
+		 *
+		 * @return mixed
+		 */
+		public function Get($key) {
+			$this->_load();
+
+			return $this->_Trait[$key];
+
+		}
+
+		/** Working 7/16/2016
+		 *
+		 */
+		public function GetAll() {
+			$this->_load();
+
+		}
+
+		/** Working 7/16/2016
+		 *
+		 */
+		public function GetAllbyWeight() {
+
+		}
+
+
+		/** Working 7/16/2016
+		 *
+		 ***/
+		public function _store() {
+			\core\cache::Store($this->_type, $this->_Trait, 0);
+		}
+
+		/** Working 7/16/2016
+		 * @return mixed
+		 ***/
+		public function _load( $overwrite = false ) {
+			if($overwrite === true || $this::$_loaded == false) {
+				return $this->_Trait = \core\cache::Get($this->_type);
+			}
+		}
+
+		/** Working 7/16/2016
+		 *
+		 ***/
+		public function Purge() {
+			\core\cache::Store($this->_type, "", 0);
+			\core\cache::Delete($this->_type);
+			$this->_Trait = array();
+		}
+
+	}
+
+	/** Working 7/16/2016
+	 * Class microWeight
+	 * simple Weighting function as traits for other classes allows for fast sorting.
+	 * @package core
+	 */
+	trait microWeight {
+		private $_weight = 0;
+		private $_microWeight = 0.0;
+
+		/** Working 7/16/2016
+		 * @param int $weight
+		 * @param int $microWeight
+		 */
+		public function setWeight($weight = 0, $microWeight = 0) {
+
+			if ($weight != 0) {
+				$this->_weight = $weight;
+			}
+
+
+			if ($microWeight != 0.0) {
+				$this->_microWeight = $microWeight;
+			}
+
+		}
+
+		/** Working 7/16/2016
+		 * @return float
+		 */
+		public function getWeight() {
+			return $this->_weight + $this->_microWeight;
+
+		}
+
+		/** Working 7/16/2016
+		 * @param int $weight
+		 * @param int $microWeight
+		 */
+		public function addToWeight($weight = 0, $microWeight = 0) {
+			if ($weight != 0) {
+				$this->_weight += $weight;
+			}
+
+
+			if ($microWeight != 0) {
+				$this->_microWeight += $microWeight;
+			}
+
+		}
+
+	}
+
+}

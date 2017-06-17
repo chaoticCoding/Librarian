@@ -1,0 +1,86 @@
+<?php
+
+namespace core\cache {
+
+    class File extends cacheEngine {
+
+        public static $_info = array(
+            'name' => "File",
+        );
+
+        private $config = array(
+            'namespace' => '',
+        );
+
+        /** TODO
+         *
+         * @param $key
+         * @return bool|\string[]
+         ***/
+        public function Exists($key) {
+
+        }
+
+        /** TODO
+         *
+         * @param $key
+         * @param $value
+         * @return bool
+         ***/
+        public function Add($key, $value) {
+
+        }
+
+        /** TODO
+         *
+         * @param $key
+         * @param $value
+         * @param int $TTL in sec
+         * @return array|bool
+         */
+        public function Store($key, $value, $TTL = 120) {
+
+
+        }
+
+        /** TODO
+         *
+         * @param $key
+         * @return mixed|null
+         */
+        public function Get($key) {
+
+        }
+
+        /** TODO
+         *
+         * @param $key
+         * @return bool|\string[]
+         */
+        public function Delete($key) {
+
+
+
+        }
+
+        /** TODO
+         * Purge for file cache will purge an entire cache file
+         *
+         */
+        public function Purge() {
+
+        }
+
+        /**
+         * File driven cache is always available it just requires that a directory is writable.
+         *
+         * @return bool
+         */
+        public static function __isUseable(){
+           return true;
+        }
+
+
+
+    }
+}

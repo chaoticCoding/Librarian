@@ -1,0 +1,91 @@
+<?php
+
+namespace core {
+    /** Static classes for sanitizing inputs
+     * Class inputManager
+     */
+    class sanitize extends \core\coreStatic
+    {
+
+        /**
+         *
+         * sanitizes User Data as HTML Special characters. ! -> &excl;
+         *
+         * @param $string
+         * @return mixed
+         */
+        static function toHTML($string)
+        {
+            return filter_var($string, FILTER_SANITIZE_SPECIAL_CHARS);
+        }
+
+        /**
+         * sanitizes User Data as encoded URI: "http%3A%2F%2Fwww.chaoticcoding.com"
+         * @param $string
+         * @return mixed
+         */
+        static function toURI($string)
+        {
+            return filter_var($string, FILTER_SANITIZE_ENCODED);
+        }
+
+        /**
+         * Class for stripping HTML tags for user text, if Allow is not blank it keeps set tags
+         *
+         * @param        $string
+         * @param string $Allowed
+         *
+         * @return string
+         */
+        static function toText($string, $Allowed = "")
+        {
+            return strip_tags($string, $Allowed);
+        }
+
+
+        /**
+         * sanitizes user input in real escaping strings,
+         *
+         * Not really Needed for PDO but may be useful else where
+         *
+         * @param $string
+         * @return string
+         */
+        static function toSQL($string)
+        {
+            return mysql_real_escape_string($string);
+
+        }
+
+        /**
+         * URI: http://css-tricks.com/serious-form-security/
+         * @param $s
+         *
+         * @return string
+         */
+        function stripcleantohtml($s)
+        {
+// Restores the added slashes (ie.: " I\'m John " for security in output, and escapes them in htmlentities(ie.:  &quot; etc.)
+// Also strips any <html> tags it may encouter
+// Use: Anything that shouldn't contain html (pretty much everything that is not a textarea)
+            return htmlentities(trim(strip_tags(stripslashes($s))), ENT_NOQUOTES, "UTF-8");
+        }
+
+        /**
+         * URI: http://css-tricks.com/serious-form-security/
+         * @param $s
+         *
+         * @return string
+         */
+        function cleantohtml($s)
+        {
+// Restores the added slashes (ie.: " I\'m John " for security in output, and escapes them in htmlentities(ie.:  &quot; etc.)
+// It preserves any <html> tags in that they are encoded as well (like &lt;html&gt;)
+// As an extra security, if people would try to inject tags that would become tags after stripping away bad characters,
+// we do still strip tags but only after htmlentities, so any genuine code examples will stay
+// Use: For input fields that may contain html, like a textarea
+            return strip_tags(htmlentities(trim(stripslashes($s))), ENT_NOQUOTES, "UTF-8");
+        }
+    }
+
+}
