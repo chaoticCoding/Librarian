@@ -1,0 +1,86 @@
+<?php
+
+namespace core\persistence;
+
+/** TODO - Inprogress
+ * Core class for storing and accessing session information
+ * Class sessioning
+ */
+class Session extends \core\coreStatic {
+
+	/** Working 7/16/2015
+	 * Opens new or Existing session
+	 ***/
+	public static function __Init__()
+    {
+		//print "new Sessioning";
+
+		session_start();
+
+	}
+
+	/** Working 7/16/2015
+	 * Regenerates Session ID, if $delete is true wipes existing session
+	 *
+	 * @param bool $delete
+	 */
+	public static function Regenerate($delete = true)
+    {
+		session_regenerate_id($delete);
+
+	}
+
+	/** Working 7/16/2015
+	 * Returns Session ID
+	 *
+	 * @return string
+	 */
+	public static function getID()
+    {
+		return session_id();
+	}
+	/** TODO - Validation?
+	 * retreives value from session vars
+	 * @param $key
+	 * @return mixed
+	 */
+	public static function Get($key)
+    {
+		return $_SESSION[$key];
+	}
+
+	/** TODO - Validation?
+	 * sets value into session vars
+	 * @param $key
+	 * @param $value
+	 */
+	public static function Set($key, $value)
+    {
+		$_SESSION[$key] = $value;
+	}
+
+	/** Working 7/16/2015
+	 * Closes session for writing useful for frame sets
+	 * URI: http://php.net/manual/en/function.session-write-close.php
+	 */
+	public static function write()
+    {
+		session_write_close ();
+	}
+
+	/** TODO - Add validation
+	 * validate session details
+	 */
+	public static function validate()
+    {
+		return true;
+	}
+
+	/** Working 7/16/2015
+	 * End and removes all set values for session
+	 */
+	public static function Destroy()
+    {
+		session_destroy();
+	}
+}

@@ -1,0 +1,136 @@
+<?php
+
+/** NOTE, both interfaces and abstracts exist in this file do to need to insure that both are available to PHP at the same time
+ *
+ */
+namespace core
+{
+	/** Working : 7/13/2013
+     *
+	 * Interface moduleInterface
+     *
+	 * @package core
+	 */
+	interface moduleInterface
+    {
+        /**
+         * __Info__ Required function for Librarian to interpret module
+         *
+         * @return mixed
+         */
+		public static function __Info__();
+
+        /**
+         * __Install__ Uses for installation of new module, moduleAbstract has empty base allowing applications that don't need installation to be created with out
+         *
+         * @return mixed
+         */
+		public static function __Install__();
+
+        /**
+         * _Default Default entry point for applications to be called to
+         *
+         * @param $Args
+         * @return mixed
+         */
+		public function _Default($Args);
+	}
+
+	/** Working : 7/13/2013
+     *
+	 * Interface eventInterface, Event based extention to moduleInterface
+     *
+	 * @package core
+	 */
+	interface eventInterface extends moduleInterface {
+
+        /**
+         * SPI Event callee, required to allow module to listen for event driven actions
+         *
+         * @param \SplSubject $event
+         * @return mixed
+         */
+		public function update(\SplSubject $event);
+
+	}
+
+	/** Working : 7/13/2013
+     *
+	 * Class moduleAbstract
+	 * @package core
+	 */
+	abstract class moduleAbstract implements moduleInterface
+    {
+		/**
+		 * __construct, called as individual module instance is created
+		 */
+		public function __construct(){;
+		}
+
+		/** TODO
+		 * Overload function for calls when the method does not exist
+		 *
+		 * http://php.net/manual/en/language.oop5.overloading.php#object.call
+		 * @param array $args
+		 */
+		public function __call($name, $args) {
+			//print($name);
+			//print_r($args);
+		}
+
+
+		/** TODO
+		 * Destruction, called as individual module instance is deleted
+         *
+		 * http://php.net/manual/en/language.oop5.decon.php
+		 */
+		function __destruct() {
+
+
+		}
+
+		/** TODO, check for module schema and if present installs it
+		 * Core installer, called as a module is installed, base module installer should detect schema files for module and install to default Database
+		 *
+		 */
+		public static function __Install__(){
+
+		}
+
+		/** TODO, check for module schema and if was previously installed removes it
+		 * Core un-installer, called as a module is uninstalled, base module uninstaller should detect schema files for module and drop schema from default Database
+		 *
+		 */
+		public static function __unInstall__(){
+
+		}
+
+		/**
+		 * default entry point
+		 */
+		public function _Default($Args){
+			$this->__call("_Default", $Args);
+		}
+	}
+
+	/** Working : 7/13/2013
+	 * Class eventAbstract
+	 *
+	 * Class abastring for applications that need event driven actions using SPL observer patterns
+	 * @package core
+	 */
+	abstract class eventAbstract extends moduleAbstract implements eventInterface, \SplObserver {
+
+
+		/**
+		 * Observer action
+         *
+		 * @param \SplSubject $event
+		 */
+		public function update(\SplSubject $event){
+			//print "test//";
+		}
+
+
+	}
+}

@@ -1,0 +1,32 @@
+<?php
+
+namespace core {
+
+	/** Working 7/16/2015
+	 * Interface coreStaticInterface
+	 * @package core
+	 */
+	interface coreStaticInterface {
+		public static function __info__();
+
+	}
+
+	/** Working 7/16/2015
+	 * Interface coreIncludeInterface
+	 * @package core
+	 */
+	interface coreIncludeInterface {
+		public static function __info__();
+
+	}
+
+	/** Working 7/16/2015
+	 * Interface coreObserverInterface
+	 * @package core
+	 */
+	interface coreObserverInterface extends coreIncludeInterface {
+
+		public function update(\SplSubject $event);
+
+	}
+}

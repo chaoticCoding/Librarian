@@ -1,0 +1,35 @@
+<?php
+
+namespace core\Guardian;
+
+/**
+ * Class css
+ * @package core\Guardian
+ */
+class js extends \core\coreInc
+{
+    /** TODO,
+     *  Compresses JS and returns compressed version
+     *
+     * @param string    $path
+     * @param bool      $allowCache      | if flag is true allows cached copy to be used, vs always building new
+     */
+    public static function compress ($path, $allowCache = true)
+    {
+
+    }
+
+    /** TODO,
+     * Collects JS file and returns it to browser
+     *
+     * @param string    $path
+     * @param bool      $allowCompressed | if flag is true loads JS file through compression controls
+     * @param bool      $allowCache      | if flag is true allows cached copy to be used, vs always building new
+     * @param bool      $allowBrowserCache      | if flag is true allows browser to cache file
+     **/
+    public static function retrieve ($path, $allowCompressed = true, $allowCache = true, $allowBrowserCache = true)
+    {
+
+    }
+
+}

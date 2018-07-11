@@ -1,0 +1,19 @@
+Base Data structures built out to be used in construction of everything....
+
+app ( application ) - base packages for building out exposed aspects
+ - Premissions and Paths are created as part of this package
+
+feature -- sub-package for building out features of a application
+
+collection - an Active Record (AR) inspired collection pattern for use with Application/Features
+
+query - a custom built query abstraction layer not quire a full ORM, built to interact with collection inspired by rather then a full AR/ORM pattern but SQL speaking objects
+
+*
+
+cron -  base packages for cron tasks
+
+CLI - base package for CLI based calls
+
+module - base package for core extensions
+

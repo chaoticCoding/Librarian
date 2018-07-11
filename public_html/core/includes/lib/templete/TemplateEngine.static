@@ -1,0 +1,131 @@
+<?php
+
+namespace core\Renderer {
+
+	/**
+	 * templete factory
+	 *
+	 * Class template
+	 */
+	class TemplateEngine extends \core\coreStatic
+    {
+		private static  $_CSS = NULL;
+		private static  $_JS = NULL;
+
+		private static $_Prepaired = [];
+
+		/**
+		 * Public constructor will be called on creation
+		 *
+		 * @param array $info
+		 ***/
+		public static function __Init__( array $info = null )
+        {
+			// TODO Disabled because of incompatibility with new core loaders
+			//self::$_CSS = new \core\Template\CSS();
+			//self::$_JS = new \core\Template\JS();
+
+			if(isset($info)){ // TODO Add Error correction
+
+			}
+		}
+
+		/**
+		 * Add new prepared content to list for rendering
+		 */
+		public static function prepair($Content, $tpl)
+        {
+
+		}
+
+		/**
+		 * Renders Data from tpl file and Data
+		 *
+		 * @param $data - Keyed array to be used in tpl
+		 * @param $tpl - tpl file to be used
+		 * @param $screen - should the output be rendered to screen
+		 *
+		 * @return string
+		 */
+		public static function render($data = [], $tpl = '', $screen = true)
+        {
+			$rendered = "";
+
+			// Ensures tpl file is present
+			if(!empty($tpl)) {
+				if (file_exists(getcwd() . "/" . $tpl)) {
+
+					// Reads tpl file into memory
+					$mytpl = fopen(getcwd() . "/" . $tpl, "r") or die("Unable to open file!");
+					$rendered = fread($mytpl, filesize($tpl));
+					fclose($mytpl);
+
+					// Replaces any keys from the tpl file with the values of $data[$key]
+					foreach ($data as $key => $val) {
+						$rendered = str_replace("<%%$key%%>", "$val", $rendered);
+
+					}
+
+					// allows render to be used both as a screen writer as well as a function for returning HTML.
+					if ($screen === TRUE) {
+						print ($rendered);
+					}
+				} else {
+					die("Unable to open file!");
+				}
+			} else {
+				die("no tpl specified file!");
+			}
+
+			// Returns completed results
+			return $rendered;
+		}
+	}
+}
+
+/** templete blocks
+ *
+ ***/
+namespace core\Renderer\Template
+{
+	/**
+	 * Class CSS used for adding and displaying CSSs
+	 *
+	 * @package core\Template
+	 */
+	class CSS extends \core\cachedTrait
+    {
+		public function __construct( )
+        {
+			$type = 'css';
+			parent::__construct($type);
+
+
+		}
+
+		public function render()
+        {
+
+		}
+	}
+
+	/**
+	 * Class JS used for adding and displaying Javascripts
+	 *
+	 * @package core\Template
+	 */
+	class JS extends \core\cachedTrait
+    {
+		public function __construct( )
+        {
+			$type = 'js';
+			parent::__construct($type);
+
+		}
+
+		public function render()
+        {
+
+		}
+	}
+}

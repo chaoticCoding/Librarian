@@ -1,0 +1,20 @@
+Core Application code base - caution as Dragons & Librarians! sleep here....
+
+WHAT ARE THESE?
+
+Directories
+
+- lib, base components of core what to teach a dog a new trick? do it here! ie how to talk to a database how to do a thing...
+
+- modules, more complex but still internal aspects of core. concepts like premissions, roles are handled here
+*note modules\base, these is proto constructors for the individual application using the framework
+
+Files
+
+core.php - this is the core of the application its what stitches everything together
+core.interface - how should all the parts talk...
+core.abstract  - whats the parts do
+
+Config.static - how to read the most basic config data...
+
+these need to be together or pretty much nothing works because nothing knows what anythigng else is....

@@ -1,0 +1,7 @@
+???? I am brave, whats in this dungeon?
+
+includes - this is what makes Librarian, Librarian. all that it was is or will be exist here.
+
+bootstrap.php - this is the thing that triggers PHP to construct Librarian and holds it while it works
+
+settings.php - this is the core settings that must be known in order to find all aspects of everything else currently some aspects are hardcoded here but will be converted to a template syntax that allows them to be queried from the environment

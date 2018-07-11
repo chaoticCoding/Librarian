@@ -1,0 +1,62 @@
+#Reason to break out the crons here vs using math/last run in php is that this way each is its own process allowing for more executions then what can be done in one second
+# likewise tasks known to take higher execution times or could should likely have their own dedicated cron
+
+# once per minute
+*  * * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "minute"
+
+# once per 15-min
+*/15  * * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "15-min"
+
+# once per 30-min
+*/30  * * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "30-min"
+
+# once per hour
+0  * * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "hour"
+
+# once per 6-hour
+*  */6 * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "6-hour"
+
+# once per 12-hour
+*  */12 * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "12-hour"
+
+# once per day
+0  0 * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "day"
+
+# once per sunday
+0  0 * * SUN . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "sunday"
+
+# once per monday
+0  0 * * MON . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "monday"
+
+# once per tueday
+0  0 * * TUE . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "tueday"
+
+# once per wensday
+0  0 * * WEN . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "wensday"
+
+# once per thursday
+0  0 * * THU . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "thursday"
+
+# once per friday
+0  0 * * FRI . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "friday"
+
+# once per saturday
+0  0 * * SAT . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "saturday"
+
+# once per week
+*  * * * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "first-last-month"
+
+# once per first of month
+0  0 1 * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "first-of-month"
+
+# once per 15th of month
+*  0 15 * * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "15th-month"
+
+# once per quarter
+0 0 1 */3 * . /opt/elasticbeanstalk/support/envvars && cd /var/www/html/cron/ && php ./cron/scheduled.php "first-last-month"
+
+# once per 6-months
+0 0 1 */6 *
+
+# once per year
+0 0 1 1 *

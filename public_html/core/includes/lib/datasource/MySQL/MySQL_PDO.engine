@@ -1,0 +1,150 @@
+<?php
+
+namespace core\datasource\MySQL_PDO
+{
+    class _DAO extends \PDO
+    {
+        /** @var string  */
+        private $dsn = null;
+
+        /** @var bool  */
+        public $debug = false;
+
+        /** @var array  */
+        private $statements = array();
+
+        #####################################################################
+        # Constructor
+        #####################################################################
+        /**
+         * datasource_PDO constructor.
+         *
+         * @param $dsn
+         * @param $user
+         * @param $pass
+         * @param $options
+         * @throws \Exception
+         */
+        public function __construct($dsn, $user, $pass, $options = null)
+        {
+            try {
+                parent::__construct($dsn, $user, $pass, $options);
+
+                $this->dsn = $dsn;
+            } catch (\Throwable $e) {
+                throw new \Exception('Unable to connect to the specified datasource.');
+            } catch (\Exception $e) {
+                throw new \Exception('Unable to connect to the specified datasource.');
+            }
+
+            $this->setDefaults();
+        }
+
+        #####################################################################
+        # Getter
+        #####################################################################
+        /**
+         * @param $name
+         *
+         * @return array|int|null
+         */
+        public function __get($name)
+        {
+            $name = strToLower($name);
+
+            switch ($name) {
+
+                case 'prepare_count':
+                    return count($this->statements);
+
+                case 'statements':
+                    return $this->statements;
+
+                case 'dsn':
+                    return $this->dsn;
+
+                default:
+                    return parent::$name;
+
+            }
+        }
+
+        #####################################################################
+        # Setup default connection properties
+        #####################################################################
+        /**
+         *
+         */
+        public function setDefaults()
+        {
+            if (DEBUG_SHOW_DATABASE_ERRORS === true) {
+                $this->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
+            } else {
+                $this->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_SILENT);
+            }
+            //$this->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);//PDO::ERRMODE_SILENT );
+        }
+
+        #####################################################################
+        # Prepare
+        #####################################################################
+
+        /**
+         * @param string $statement
+         * @param array $driver_options[] [optional]
+         *
+         * @return \PDOStatement
+         */
+        public function prepare($statement, $driver_options = array())
+        {
+            if ($this->debug === true) {
+                try {
+                    /*$backtrace = debug_backtrace();
+
+                    $this->statements[] = array(
+                        'class' => $backtrace[1]['class'],
+                        'function' => $backtrace[1]['function'],
+                        'sql' => $statement
+                    );
+
+                    //var_dump($this->statements);
+
+                    syslog(LOG_DEBUG, print_r($this->statements, true));*/
+                } catch (\Throwable $e) {
+                } catch (\Exception $e) {
+
+                }
+            }
+
+            //$driver_options = is_array($driver_options) ? $driver_options : array($driver_options);
+
+            return parent::prepare($statement, $driver_options);
+        }
+
+        #####################################################################
+        # Get the last inserted ID
+        #####################################################################
+        /**
+         * @return int
+         */
+        public function getLastInsertedId()
+        {
+            $rows = $this->query('SELECT LAST_INSERT_ID() AS lastId');
+
+            return (int) $rows->fetchColumn();
+        }
+
+        #####################################################################
+        # Get the row count
+        #####################################################################
+        /**
+         * @return int
+         */
+        public function getRowCount()
+        {
+            $rows = $this->query('SELECT ROW_COUNT() AS rowCount');
+
+            return (int) $rows->fetchColumn();
+        }
+    }
+}

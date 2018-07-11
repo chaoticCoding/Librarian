@@ -1,0 +1,6 @@
+Librarian really is becoming more of a module inside of core vs before where it was a direct behavior.
+
+Librarian is responsible for path determination.
+
+What separates Librarian from most routers is that Librarian is an attempt to build a preemptive route processor,
+in the fact that it contains all the needed knowledge for all the routes used by the application, validation that those routes are real and knowledge of what the module needs to application/feature needs to work with out accessing module data until after the route is already validated thus minimising load times of loading unneeded code

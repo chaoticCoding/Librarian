@@ -1,0 +1,41 @@
+<?php
+
+namespace core {
+	/**
+	 * Simplified settings access
+	 *
+	 * Class Config
+	 */
+	class Config extends \core\coreStatic {
+
+		/** Working 7/16/2015
+		 * returns configurations if exist else returns false
+		 * @param null $path : Database || Database/default
+		 *
+		 * @return bool
+		 */
+		public static function Get($path = null) {
+			global $settings;
+
+			if ($path) {
+				$config = $settings;
+				$path = explode('/', $path);
+				$exists = 0;
+
+				foreach ($path as $bit) {
+
+					if (isset($config[$bit])) {
+						$exists++;
+						$config = $config[$bit];
+					}
+				}
+
+				if (count($path) == $exists) {
+					return $config;
+				}
+			}
+
+			return false;
+		}
+	}
+}

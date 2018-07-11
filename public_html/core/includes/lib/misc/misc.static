@@ -1,0 +1,109 @@
+<?php
+
+namespace core;
+
+/**  Working 7/16/2015
+ * Adds Trailing value to end if not present
+ *
+ * @param $string
+ * @param $character
+ * @return string
+ */
+function includeTrailingCharacter($string, $character) {
+	if (strlen($string) > 0) {
+		if (substr($string, -1) !== $character) {
+			return $string . $character;
+		} else {
+			return $string;
+		}
+	} else {
+		return $character;
+	}
+}
+
+/**  Working 7/16/2015
+ * function for creating micro-weighting;
+ *
+ * URL: https://stackoverflow.com/a/19577545/1851747
+ *
+ * @param     $text - Text to weigh
+ * @param int $amount - amount of characters to loop for a given text
+ * @param int $start_weight -  the starting weight, the lower the value, the higher the priority
+ *
+ * @return float
+ */
+function get_weight_from_name($text, $amount = 4, $start_weight = -30) {
+	$weight = $start_weight;
+
+	for ($i = 0; $i < $amount; ++$i) {
+		$weight += (ord(substr(strtolower($text), $i)) - 97) / (intval(sprintf('1%s', str_repeat(0, $i))));
+	}
+
+	return round($weight, 2);
+}
+
+/** Working 7/16/2015
+ * function for creating micro-weighting;
+ *
+ * URL: https://stackoverflow.com/a/19577545/1851747
+ *
+ * @param     $text - Text to weigh
+ * @param int $amount - amount of characters to loop for a given text
+ *
+ * @return float
+ */
+function make_microWeight_from_name($text, $amount = 4) {
+	$weight = 0;
+
+	for ($i = 0; $i < $amount; ++$i) {
+		$weight += (ord(substr(strtolower($text), $i)) - 97) / 1;
+	}
+
+	return floatval ( "." . $weight );
+}
+
+/** Working 7/16/2015
+ * Function for testing if Array is associative or sequential based on type of keys.
+ *
+ * URL : http://stackoverflow.com/a/4254008/1851747
+ * @param $array
+ *
+ * @return bool
+ */
+function is_assoc($array) {
+	return (bool)count(array_filter(array_keys($array), 'is_string'));
+}
+
+
+
+/** Working 7/16/2015
+ * Removes 1st element from array
+ * @return int
+ * @param $array array
+ * @param $value mixed
+ * @desc Prepend a reference to an element to the beginning of an array. Renumbers numeric keys, so $value is always inserted to $array[0]
+ */
+function array_unshift_ref(&$array, &$value) {
+	$return = array_unshift($array,'');
+	$array[0] =& $value;
+	return $return;
+}
+
+/** Working 7/16/2015
+ * Returns Mime type form file blob to ensure that real data is sent
+ * @param $Name
+ * @param $tempName
+ *
+ * @return mixed
+ */
+function getMimeType ($Name, $tempName) {
+	// Creates an empty file Information
+	$finfo = new finfo(FILEINFO_MIME_TYPE);
+	// gets content of tile as a blob
+	$fileContents = file_get_contents($_FILES[$Name][$tempName]);
+	//Buffers file mime information
+	$mimeType = $finfo->buffer($fileContents);
+
+	//returns file mimeInfo
+	return $mimeType;
+}

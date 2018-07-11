@@ -1,0 +1,5 @@
+Librarian is a research/experiential backend framework, designed to push PHP patterns to their limits and test out new design patterns.
+
+As it's designed as a backend framework most of the outputs are expected to be returned as JSON values to be used with a view layer such as Vue.JS, however there is a html templete engine being build this is designed for either mail sends or for AHAH based needs
+
+AS of the last update this is likely pretty broken as I am in the process of merging 3 fairly different projects into Librarians code to bring in some new features that I have worked on over the last few years.

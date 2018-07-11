@@ -1,0 +1,180 @@
+<?php
+
+namespace core {
+
+	/** TODO
+	 * Good upgrade but will not solve the issue with caching core data as it won't be complete until most of the loader has started... nor will lit allow __IncludeFile to cache data.@deprecated
+	 * cache Engine factory
+	 * @package core
+	 ***/
+	class cache extends \core\coreStatic {
+		private static $_Engines = [];
+
+		/** TODO Returns information about this module
+		 *
+		 */
+		public static $_info = [
+			'name' => "Cache",
+
+			'extensions' => [
+				'fileType' => 'cache_engine', // file extention to approve, it will be added to the bootstrap system and permissions will be inherited from this module
+
+				'paths' => [ // files to enable, only files in root or sub-directories of the parent class can be accessed, paths must always be used
+					'APC' => "APC.cache_engine",
+					'File' => "File.cache_engine",
+					'MemCache' => "MemCache.cache_engine"
+				]
+			],
+
+			'engines' => [], // Specific to cache maintains a list of active cacheEngines to so we don't need to keep re-testing which are available
+
+		];
+
+		/** TODO add loader to test types of cacheEngines available
+		 * Init function bootstrap sends out onload
+		 */
+		public static function __Init__() {
+
+			//TODO loop though each sub-module and call the __isUseable function to test if a cache engine is available. usable engines should be stored in the $_info under engines.
+			print("<!-- -- cache: testing engines -->\n");
+
+			foreach(self::$_info['extensions']['paths'] as $name => $path) {
+				$cache = '\\core\\cache\\' . $name;
+				print("<!-- -- cache: testing " . $cache . " -->\n");
+
+				if(method_exists($cache, '__isUseable')){
+					$_Engines[$name] = $cache::__isUseable();
+					print("<!-- --- $name Status: " . $_Engines[$name] . " -->\n");
+				} else {
+					print("<!-- --- $name Status: Unknown -->\n");
+				}
+
+			}
+
+		}
+
+		public static function newCache($namespace, $type = 'default'){
+
+		}
+
+		public static function findCache($namespace, $type = 'default'){
+
+
+		}
+
+		public static function destroyCache($namespace, $type = 'default'){
+
+		}
+	}
+}
+
+namespace core\cache {
+	/**
+	 * Interface contructor that all cache sub-applications must adhere to so the cacheFactory will work
+	 * */
+	interface cacheEngineInterface {
+
+		/**
+		 * Check for the presences of a key with-in a given cache
+		 *
+		 *  should return false if delete cannot be preformed or is unsuccessful, or if key exists return true
+		 *
+		 * @param $key
+		 * @return mixed
+		 */
+		public function Exists($key);
+
+		/**
+		 * Adds a new Key/Value pair to a cache namespace
+		 *
+		 *  should return false if Add cannot be preformed or is unsuccessful
+		 *
+		 * Add will not over write existing values
+		 * @param $key
+		 * @param $value
+		 * @return mixed
+		 */
+		public function Add($key, $value);
+
+		/**
+		 * Stores a new or existing Key/Value pair in cache namespace
+		 *
+		 * should return false if Store cannot be preformed or is unsuccessful
+		 *
+		 * @param $key
+		 * @param $value
+		 * @param int $TTL
+		 * @return mixed
+		 */
+		public function Store($key, $value, $TTL = 120);
+
+		/**
+		 * Attempts to retrieve a value from the cache namespace for a given key
+		 *
+		 *  should return false if Get cannot be preformed or is unsuccessful, or return value of key if successful
+		 *
+		 * @param $key
+		 * @return mixed
+		 */
+		public function Get($key);
+
+		/**
+		 * Attempts to remove a value/key pair from the cache namespace
+		 *
+		 * should return false if delete cannot be preformed or is unsuccessful
+		 *
+		 * @param $key
+		 * @return mixed
+		 */
+		public function Delete($key);
+
+		/**
+		 * Purge removes all values from a cache namespace
+		 *
+		 * this function should be used carefully as not all caches are going to be able to remove a namespace and may purge all data.
+		 *
+		 * should return false if purge cannot be preformed or is unsuccessful
+		 *
+		 * @return mixed
+		 */
+		public function Purge();
+
+		/**
+		 * constructor
+		 * */
+		public function __construct($config);
+
+		/**
+		 * public function to test if a cache sub-module can be used, in case the prerequisite are missing
+		 * @return bool
+		 */
+		public static function __isUseable();
+	}
+
+	abstract class cacheEngine implements cacheEngineInterface{
+
+		/**
+		 * Storage for _info of cache sub-applications, each module should replace or append this data
+		 * @var array
+		 */
+		public static $_info = [
+			'name' => "cacheEngine",
+		];
+
+		/**
+		 * Storage for $config of cache sub-module, each module should replace or append this data
+		 * @var array
+		 */
+		private $config = [
+			'namespace' => '',
+		];
+
+
+		/**
+		 * @param $namespace
+		 */
+		public function __construct($namespace) {
+			$this->config['namespace'] = $namespace;
+		}
+	}
+}
